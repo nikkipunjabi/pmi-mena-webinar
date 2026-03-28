@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting to Webinar...</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        .backup-link {
+            margin-top: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        .backup-link:hover {
+            background: white;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner"></div>
+        <h1>Redirecting to Webinar Registration...</h1>
+        <p>You'll be redirected in a moment</p>
+        <a href="https://pmi-org.zoom.us/webinar/register/WN_WdaRj3MwQGSYds9UkPeuaQ#/registration" class="backup-link">
+            Click here if not redirected automatically
+        </a>
+    </div>
+
+    <script>
+        // Configuration - REPLACE THIS URL with your Google Apps Script Web App URL
+        const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+        
+        const ZOOM_URL = 'https://pmi-org.zoom.us/webinar/register/WN_WdaRj3MwQGSYds9UkPeuaQ#/registration';
+
+        // Get source from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const source = urlParams.get('source') || 'direct';
+
+        // Collect tracking data
+        const trackingData = {
+            timestamp: new Date().toISOString(),
+            source: source,
+            userAgent: navigator.userAgent,
+            referrer: document.referrer || 'none',
+            language: navigator.language,
+            screenSize: `${screen.width}x${screen.height}`
+        };
+
+        // Send tracking data to Google Sheets
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(trackingData)
+        }).then(() => {
+            console.log('Tracking logged');
+        }).catch(err => {
+            console.log('Tracking failed, but continuing redirect:', err);
+        }).finally(() => {
+            // Redirect after 1.5 seconds regardless of tracking success
+            setTimeout(() => {
+                window.location.href = ZOOM_URL;
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
