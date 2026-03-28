@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webinar Link Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        .platform-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .webinar-list {
+            margin-top: 2rem;
+        }
+
+        .webinar-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .webinar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .webinar-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .webinar-url {
+            font-size: 0.85rem;
+            color: #666;
+            word-break: break-all;
+        }
+
+        .link-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .link-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .platform-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge-email { background: #fef3c7; color: #92400e; }
+        .badge-linkedin { background: #dbeafe; color: #1e40af; }
+        .badge-facebook { background: #ddd6fe; color: #5b21b6; }
+        .badge-instagram { background: #fce7f3; color: #9f1239; }
+        .badge-twitter { background: #e0f2fe; color: #075985; }
+
+        .tracking-url {
+            font-size: 0.8rem;
+            color: #666;
+            word-break: break-all;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .copy-btn {
+            width: 100%;
+            padding: 0.5rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #5568d3;
+        }
+
+        .copy-btn.copied {
+            background: #10b981;
+        }
+
+        .delete-btn {
+            color: #dc2626;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .base-url-display {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .base-url-display strong {
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .link-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Webinar Link Manager</h1>
+            <p>Create trackable links for all your webinars</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalWebinars">0</div>
+                <div class="stat-label">Total Webinars</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalLinks">0</div>
+                <div class="stat-label">Tracking Links</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>➕ Add New Webinar</h2>
+            <form id="webinarForm">
+                <div class="form-group">
+                    <label for="webinarTitle">Webinar Title</label>
+                    <input 
+                        type="text" 
+                        id="webinarTitle" 
+                        placeholder="e.g., AI in Action" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="targetUrl">Target URL (Zoom/Webinar Link)</label>
+                    <textarea 
+                        id="targetUrl" 
+                        placeholder="https://pmi-org.zoom.us/webinar/register/..." 
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Platforms to Promote</label>
+                    <div class="platform-checkboxes">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="platform-email" value="email" checked>
+                            <label for="platform-email">Email</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="platform-linkedin" value="linkedin" checked>
+                            <label for="platform-linkedin">LinkedIn</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="platform-facebook" value="facebook" checked>
+                            <label for="platform-facebook">Facebook</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="platform-instagram" value="instagram" checked>
+                            <label for="platform-instagram">Instagram</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="platform-twitter" value="twitter" checked>
+                            <label for="platform-twitter">Twitter</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="base-url-display">
+                    <strong>Base URL:</strong> nikkipunjabi.github.io/pmi-mena-webinar
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+                    Generate Tracking Links
+                </button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>📊 Your Webinars</h2>
+            <div id="webinarList" class="webinar-list">
+                <div class="empty-state">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    <p>No webinars yet. Add your first webinar above!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Link copied to clipboard!</div>
+
+    <script>
+        // CONFIGURATION - Your GitHub Pages URL
+        const BASE_URL = 'nikkipunjabi.github.io/pmi-mena-webinar';
+
+        // Storage key
+        const STORAGE_KEY = 'webinarData';
+
+        // Load webinars from localStorage
+        function loadWebinars() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        }
+
+        // Save webinars to localStorage
+        function saveWebinars(webinars) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(webinars));
+            updateStats();
+            renderWebinars();
+        }
+
+        // Generate slug from title
+        function generateSlug(title) {
+            return title.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
+
+        // Update statistics
+        function updateStats() {
+            const webinars = loadWebinars();
+            const totalLinks = webinars.reduce((sum, w) => sum + w.platforms.length, 0);
+            
+            document.getElementById('totalWebinars').textContent = webinars.length;
+            document.getElementById('totalLinks').textContent = totalLinks;
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Copy to clipboard
+        async function copyToClipboard(text, button) {
+            try {
+                await navigator.clipboard.writeText(text);
+                const originalText = button.textContent;
+                button.textContent = '✓ Copied!';
+                button.classList.add('copied');
+                showToast('Link copied to clipboard!');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                alert('Failed to copy. Please copy manually.');
+            }
+        }
+
+        // Render webinars
+        function renderWebinars() {
+            const webinars = loadWebinars();
+            const container = document.getElementById('webinarList');
+
+            if (webinars.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        <p>No webinars yet. Add your first webinar above!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = webinars.map((webinar, index) => `
+                <div class="webinar-item">
+                    <div class="webinar-header">
+                        <div>
+                            <div class="webinar-title">${webinar.title}</div>
+                            <div class="webinar-url">Target: ${webinar.targetUrl}</div>
+                        </div>
+                        <button class="delete-btn" onclick="deleteWebinar(${index})" title="Delete webinar">
+                            🗑️
+                        </button>
+                    </div>
+                    
+                    <div class="link-grid">
+                        ${webinar.platforms.map(platform => {
+                            const trackingUrl = `https://${BASE_URL}?id=${webinar.slug}&source=${platform}`;
+                            return `
+                                <div class="link-item">
+                                    <span class="platform-badge badge-${platform}">${platform}</span>
+                                    <div class="tracking-url">${trackingUrl}</div>
+                                    <button class="copy-btn" onclick="copyToClipboard('${trackingUrl}', this)">
+                                        📋 Copy Link
+                                    </button>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Delete webinar
+        function deleteWebinar(index) {
+            if (confirm('Are you sure you want to delete this webinar and all its tracking links?')) {
+                const webinars = loadWebinars();
+                webinars.splice(index, 1);
+                saveWebinars(webinars);
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('webinarForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const title = document.getElementById('webinarTitle').value.trim();
+            const targetUrl = document.getElementById('targetUrl').value.trim();
+            
+            // Get selected platforms
+            const platforms = [];
+            document.querySelectorAll('.platform-checkboxes input[type="checkbox"]:checked').forEach(checkbox => {
+                platforms.push(checkbox.value);
+            });
+
+            if (platforms.length === 0) {
+                alert('Please select at least one platform!');
+                return;
+            }
+
+            // Create webinar object
+            const webinar = {
+                id: Date.now(),
+                title: title,
+                targetUrl: targetUrl,
+                slug: generateSlug(title),
+                platforms: platforms,
+                createdAt: new Date().toISOString()
+            };
+
+            // Save to storage
+            const webinars = loadWebinars();
+            webinars.unshift(webinar); // Add to beginning
+            saveWebinars(webinars);
+
+            // Reset form
+            document.getElementById('webinarForm').reset();
+            
+            // Re-check all platforms by default
+            document.querySelectorAll('.platform-checkboxes input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+
+            // Show success message
+            showToast('Webinar added successfully!');
+
+            // Scroll to the new webinar
+            setTimeout(() => {
+                document.querySelector('.webinar-item').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        });
+
+        // Initialize
+        updateStats();
+        renderWebinars();
+    </script>
+</body>
+</html>
