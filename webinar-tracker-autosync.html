@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redirecting to Webinar - PMI UAE Chapter</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          Oxygen,
+          Ubuntu,
+          Cantarell,
+          sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        background: linear-gradient(
+          135deg,
+          #2d1b3d 0%,
+          #5b2c6f 50%,
+          #6b3d7f 100%
+        );
+        color: white;
+        position: relative;
+        overflow: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 107, 53, 0.1) 0%,
+          transparent 70%
+        );
+        border-radius: 50%;
+      }
+
+      body::after {
+        content: "";
+        position: absolute;
+        bottom: -30%;
+        left: -10%;
+        width: 80%;
+        height: 80%;
+        background: radial-gradient(
+          circle,
+          rgba(139, 95, 168, 0.15) 0%,
+          transparent 70%
+        );
+        border-radius: 50%;
+      }
+
+      .container {
+        text-align: center;
+        padding: 3rem 2rem;
+        max-width: 600px;
+        position: relative;
+        z-index: 1;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+
+      .logo {
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: center;
+      }
+
+      .logo img {
+        max-width: 200px;
+        height: auto;
+        filter: brightness(1.1);
+      }
+
+      .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        border-top: 4px solid #ff6b35;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 2rem;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: white;
+      }
+
+      .webinar-title {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 107, 53, 0.2) 0%,
+          rgba(139, 95, 168, 0.2) 100%
+        );
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        margin: 1.5rem 0;
+        font-size: 1.15rem;
+        font-weight: 500;
+        border: 1px solid rgba(255, 107, 53, 0.3);
+        line-height: 1.5;
+      }
+
+      p {
+        opacity: 0.9;
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+      }
+
+      .backup-link {
+        margin-top: 2rem;
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, #ff6b35 0%, #f26522 100%);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+      }
+
+      .backup-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+      }
+
+      .error {
+        background: rgba(239, 68, 68, 0.9);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-top: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .footer {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 0.85rem;
+        opacity: 0.7;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 2rem 1.5rem;
+        }
+        h1 {
+          font-size: 1.5rem;
+        }
+        .webinar-title {
+          font-size: 1rem;
+          padding: 0.875rem 1.25rem;
+        }
+        .logo img {
+          max-width: 160px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="logo">
+        <img
+          src="https://www.pmiuae.org/images/pmiuae_logo_jan_2026.png"
+          alt="PMI UAE Chapter"
+        />
+      </div>
+
+      <div class="spinner"></div>
+      <h1>Redirecting to Webinar...</h1>
+      <div class="webinar-title" id="webinarTitle">Loading...</div>
+      <p>You'll be redirected in a moment</p>
+      <a href="#" id="backupLink" class="backup-link" style="display: none">
+        Click here if not redirected automatically →
+      </a>
+      <div id="errorMessage" style="display: none"></div>
+
+      <div class="footer">PMI UAE Chapter Webinar Tracking System</div>
+    </div>
+
+    <script>
+      // CONFIGURATION - Set your Google Apps Script URL here
+      const GOOGLE_SCRIPT_URL =
+        "https://script.google.com/macros/s/AKfycbyd0OAfB7uXx0nQ1O46W1Ul0ujZDzaX13kKAwj5Zwgqwk5nRuZuhqeU5_wbcV9VKfGeEA/exec";
+
+      // Get parameters from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const webinarId = urlParams.get("id") || "";
+      const source = urlParams.get("source") || "direct";
+
+      // Fetch webinar from Google Sheets
+      async function fetchWebinar() {
+        try {
+          const response = await fetch(
+            `${GOOGLE_SCRIPT_URL}?action=get_webinar&id=${webinarId}`,
+          );
+          const data = await response.json();
+
+          if (data.status === "success" && data.webinar) {
+            return data.webinar;
+          } else {
+            return null;
+          }
+        } catch (error) {
+          console.error("Error fetching webinar:", error);
+          return null;
+        }
+      }
+
+      // Track and redirect
+      async function trackAndRedirect() {
+        if (!webinarId) {
+          showError("No webinar ID provided");
+          return;
+        }
+
+        // Fetch webinar details from Google Sheets
+        const webinar = await fetchWebinar();
+
+        if (!webinar) {
+          showError("Webinar not found or has expired");
+          return;
+        }
+
+        // Show webinar title
+        document.getElementById("webinarTitle").textContent = webinar.title;
+
+        // Set backup link
+        const backupLink = document.getElementById("backupLink");
+        backupLink.href = webinar.targetUrl;
+        backupLink.style.display = "inline-block";
+
+        // Collect tracking data
+        const trackingData = {
+          timestamp: new Date().toISOString(),
+          webinarId: webinar.slug,
+          webinarTitle: webinar.title,
+          targetUrl: webinar.targetUrl,
+          source: source,
+          userAgent: navigator.userAgent,
+          referrer: document.referrer || "none",
+          language: navigator.language,
+          screenSize: `${screen.width}x${screen.height}`,
+        };
+
+        // Send tracking data to Google Sheets
+        fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(trackingData),
+        })
+          .then(() => {
+            console.log("Tracking logged");
+          })
+          .catch((err) => {
+            console.log("Tracking failed, but continuing redirect:", err);
+          })
+          .finally(() => {
+            // Redirect after 1.5 seconds
+            setTimeout(() => {
+              window.location.href = webinar.targetUrl;
+            }, 1500);
+          });
+      }
+
+      // Show error
+      function showError(message) {
+        document.querySelector(".spinner").style.display = "none";
+        document.querySelector("h1").textContent = "Webinar Not Found";
+        document.getElementById("webinarTitle").textContent =
+          "Invalid webinar link";
+        document.getElementById("errorMessage").innerHTML = `
+                <div class="error">
+                    <strong>Error:</strong> ${message}
+                    <br><br>
+                    Please contact the PMI UAE Chapter team or visit 
+                    <a href="https://www.pmiuae.org" style="color: #FF6B35; text-decoration: underline;">pmiuae.org</a>
+                </div>
+            `;
+        document.getElementById("errorMessage").style.display = "block";
+      }
+
+      // Initialize
+      trackAndRedirect();
+    </script>
+  </body>
+</html>
