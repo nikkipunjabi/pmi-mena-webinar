@@ -624,7 +624,6 @@
       async function saveWebinar(webinar) {
         const response = await fetch(GOOGLE_SCRIPT_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "save_webinar",
             ...webinar,
@@ -640,7 +639,6 @@
         try {
           const response = await fetch(GOOGLE_SCRIPT_URL, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               action: "delete_webinar",
               id: id,
