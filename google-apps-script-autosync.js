@@ -55,7 +55,7 @@ function rebuildSummarySheet() {
   ss.moveActiveSheet(1);
 
   const platforms = ["email", "linkedin", "facebook", "instagram", "twitter"];
-  const headers = ["Webinar", ...platforms.map(p => p.charAt(0).toUpperCase() + p.slice(1)), "Total"];
+  const headers = ["Webinar", "Date Added", ...platforms.map(p => p.charAt(0).toUpperCase() + p.slice(1)), "Total"];
 
   // Header row
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
@@ -71,9 +71,10 @@ function rebuildSummarySheet() {
   if (rows.length <= 1) return; // no webinars yet
 
   const wHeaders = rows[0];
-  const slugIndex   = wHeaders.indexOf("slug");
-  const titleIndex  = wHeaders.indexOf("title");
-  const statusIndex = wHeaders.indexOf("status");
+  const slugIndex      = wHeaders.indexOf("slug");
+  const titleIndex     = wHeaders.indexOf("title");
+  const statusIndex    = wHeaders.indexOf("status");
+  const createdAtIndex = wHeaders.indexOf("createdAt");
 
   const activeWebinars = rows.slice(1).filter(r => r[statusIndex] === "active");
   if (activeWebinars.length === 0) return;
@@ -83,22 +84,27 @@ function rebuildSummarySheet() {
     const rowNum = i + 2; // row 1 is header
     const slug  = webinar[slugIndex];
     const title = webinar[titleIndex];
+    const rawDate = webinar[createdAtIndex];
+    const dateAdded = rawDate ? Utilities.formatDate(new Date(rawDate), Session.getScriptTimeZone(), "dd MMM yyyy") : "";
 
     // Col A: webinar title
     sheet.getRange(rowNum, 1).setValue(title);
 
-    // Cols B–F: COUNTIFS per platform
+    // Col B: date added
+    sheet.getRange(rowNum, 2).setValue(dateAdded);
+
+    // Cols C–G: COUNTIFS per platform (shifted by 1 due to Date Added column)
     // Tracking Data col B = webinarId, col E = source
     platforms.forEach((platform, pi) => {
-      const col = pi + 2;
+      const col = pi + 3;
       const formula = `=COUNTIFS('Tracking Data'!B:B,"${slug}",'Tracking Data'!E:E,"${platform}")`;
       sheet.getRange(rowNum, col).setFormula(formula);
     });
 
-    // Col G: Total = SUM of platform cols
-    const firstPlatformCol = "B";
-    const lastPlatformCol  = String.fromCharCode(65 + platforms.length); // F
-    sheet.getRange(rowNum, platforms.length + 2)
+    // Col H: Total = SUM of platform cols
+    const firstPlatformCol = "C";
+    const lastPlatformCol  = String.fromCharCode(65 + platforms.length + 1); // G
+    sheet.getRange(rowNum, platforms.length + 3)
       .setFormula(`=SUM(${firstPlatformCol}${rowNum}:${lastPlatformCol}${rowNum})`);
   });
 
@@ -113,8 +119,9 @@ function rebuildSummarySheet() {
     }
   });
 
-  // Bold the Total column
+  // Bold the Total column and center-align Date Added
   sheet.getRange(2, headers.length, activeWebinars.length, 1).setFontWeight("bold");
+  sheet.getRange(2, 2, activeWebinars.length, 1).setHorizontalAlignment("center");
 
   // Auto-resize columns
   sheet.autoResizeColumns(1, headers.length);
