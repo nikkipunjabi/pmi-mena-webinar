@@ -469,6 +469,15 @@
           </div>
 
           <div class="form-group">
+            <label for="webinarDate">Webinar Date</label>
+            <input
+              type="date"
+              id="webinarDate"
+              required
+            />
+          </div>
+
+          <div class="form-group">
             <label>Platforms to Promote</label>
             <div class="platform-checkboxes">
               <div class="checkbox-item">
@@ -689,6 +698,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
                         <div>
                             <div class="webinar-title">${webinar.title}</div>
+                            ${webinar.webinarDate ? `<div class="webinar-url">📅 ${new Date(webinar.webinarDate + 'T00:00:00').toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}</div>` : ''}
                             <div class="webinar-url">Target: ${webinar.targetUrl}</div>
                         </div>
                         <button class="delete-btn" onclick="deleteWebinar('${webinar.id}')" title="Delete">
@@ -726,6 +736,7 @@
 
           const title = document.getElementById("webinarTitle").value.trim();
           const targetUrl = document.getElementById("targetUrl").value.trim();
+          const webinarDate = document.getElementById("webinarDate").value;
 
           const platforms = [];
           document
@@ -745,6 +756,7 @@
             targetUrl: targetUrl,
             slug: generateSlug(title),
             platforms: platforms,
+            webinarDate: webinarDate,
             createdAt: new Date().toISOString(),
           };
 

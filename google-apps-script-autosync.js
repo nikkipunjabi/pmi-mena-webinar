@@ -27,7 +27,7 @@ function getOrCreateSheet(name, headers) {
 
 function getWebinarsSheet() {
   return getOrCreateSheet(WEBINARS_SHEET, [
-    "id", "title", "targetUrl", "slug", "platforms", "createdAt", "status"
+    "id", "title", "targetUrl", "slug", "platforms", "webinarDate", "createdAt", "status"
   ]);
 }
 
@@ -55,7 +55,12 @@ function rebuildSummarySheet() {
   ss.moveActiveSheet(1);
 
   const platforms = ["email", "linkedin", "facebook", "instagram", "twitter"];
-  const headers = ["Webinar", "Date Added", ...platforms.map(p => p.charAt(0).toUpperCase() + p.slice(1)), "Total"];
+  // Columns: Webinar | Webinar Date | Date Added | Status | Email | LinkedIn | Facebook | Instagram | Twitter | Total
+  const headers = [
+    "Webinar", "Webinar Date", "Date Added", "Status",
+    ...platforms.map(p => p.charAt(0).toUpperCase() + p.slice(1)),
+    "Total"
+  ];
 
   // Header row
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
@@ -65,63 +70,88 @@ function rebuildSummarySheet() {
     .setFontWeight("bold");
   sheet.setFrozenRows(1);
 
-  // Load active webinars
+  // Load ALL webinars (active + deleted) — never hide from Summary
   const webinarsSheet = getWebinarsSheet();
   const rows = webinarsSheet.getDataRange().getValues();
-  if (rows.length <= 1) return; // no webinars yet
+  if (rows.length <= 1) return;
 
   const wHeaders = rows[0];
-  const slugIndex      = wHeaders.indexOf("slug");
-  const titleIndex     = wHeaders.indexOf("title");
-  const statusIndex    = wHeaders.indexOf("status");
-  const createdAtIndex = wHeaders.indexOf("createdAt");
+  const slugIndex        = wHeaders.indexOf("slug");
+  const titleIndex       = wHeaders.indexOf("title");
+  const statusIndex      = wHeaders.indexOf("status");
+  const createdAtIndex   = wHeaders.indexOf("createdAt");
+  const webinarDateIndex = wHeaders.indexOf("webinarDate");
 
-  const activeWebinars = rows.slice(1).filter(r => r[statusIndex] === "active");
-  if (activeWebinars.length === 0) return;
+  const allWebinars = rows.slice(1);
+  if (allWebinars.length === 0) return;
 
-  // Write one row per webinar with COUNTIFS formulas
-  activeWebinars.forEach((webinar, i) => {
-    const rowNum = i + 2; // row 1 is header
-    const slug  = webinar[slugIndex];
-    const title = webinar[titleIndex];
-    const rawDate = webinar[createdAtIndex];
-    const dateAdded = rawDate ? Utilities.formatDate(new Date(rawDate), Session.getScriptTimeZone(), "dd MMM yyyy") : "";
+  // Sort newest first by createdAt
+  allWebinars.sort((a, b) => {
+    const dateA = a[createdAtIndex] ? new Date(a[createdAtIndex]) : new Date(0);
+    const dateB = b[createdAtIndex] ? new Date(b[createdAtIndex]) : new Date(0);
+    return dateB - dateA;
+  });
 
-    // Col A: webinar title
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  allWebinars.forEach((webinar, i) => {
+    const rowNum = i + 2;
+    const slug        = webinar[slugIndex];
+    const title       = webinar[titleIndex];
+    const sheetStatus = webinar[statusIndex];
+    const rawCreated  = webinar[createdAtIndex];
+    const rawWebDate  = webinar[webinarDateIndex];
+
+    const dateAdded  = rawCreated ? Utilities.formatDate(new Date(rawCreated), Session.getScriptTimeZone(), "dd MMM yyyy") : "";
+    const webinarDate = rawWebDate ? Utilities.formatDate(new Date(rawWebDate + "T00:00:00"), Session.getScriptTimeZone(), "dd MMM yyyy") : "";
+
+    // Determine status: Completed if deleted OR webinar date has passed
+    const isCompleted = sheetStatus === "deleted" ||
+      (rawWebDate && new Date(rawWebDate + "T00:00:00") < today);
+    const displayStatus = isCompleted ? "Completed" : "Active";
+
+    // Col A: title, B: webinar date, C: date added, D: status
     sheet.getRange(rowNum, 1).setValue(title);
+    sheet.getRange(rowNum, 2).setValue(webinarDate);
+    sheet.getRange(rowNum, 3).setValue(dateAdded);
+    sheet.getRange(rowNum, 4).setValue(displayStatus);
 
-    // Col B: date added
-    sheet.getRange(rowNum, 2).setValue(dateAdded);
-
-    // Cols C–G: COUNTIFS per platform (shifted by 1 due to Date Added column)
-    // Tracking Data col B = webinarId, col E = source
+    // Cols E–I: COUNTIFS per platform
     platforms.forEach((platform, pi) => {
-      const col = pi + 3;
+      const col = pi + 5;
       const formula = `=COUNTIFS('Tracking Data'!B:B,"${slug}",'Tracking Data'!E:E,"${platform}")`;
       sheet.getRange(rowNum, col).setFormula(formula);
     });
 
-    // Col H: Total = SUM of platform cols
-    const firstPlatformCol = "C";
-    const lastPlatformCol  = String.fromCharCode(65 + platforms.length + 1); // G
-    sheet.getRange(rowNum, platforms.length + 3)
+    // Col J: Total
+    const firstPlatformCol = "E";
+    const lastPlatformCol  = String.fromCharCode(64 + 5 + platforms.length - 1); // I
+    sheet.getRange(rowNum, platforms.length + 5)
       .setFormula(`=SUM(${firstPlatformCol}${rowNum}:${lastPlatformCol}${rowNum})`);
-  });
 
-  // Formatting
-  const dataRange = sheet.getRange(2, 1, activeWebinars.length, headers.length);
-  dataRange.setBackground("#F9F6FC");
+    // Row styling: grey out completed, white/light for active
+    if (isCompleted) {
+      sheet.getRange(rowNum, 1, 1, headers.length)
+        .setBackground("#F0F0F0")
+        .setFontColor("#999999");
+    } else if (i % 2 === 0) {
+      sheet.getRange(rowNum, 1, 1, headers.length).setBackground("#FFFFFF");
+    } else {
+      sheet.getRange(rowNum, 1, 1, headers.length).setBackground("#F9F6FC");
+    }
 
-  // Alternate row shading
-  activeWebinars.forEach((_, i) => {
-    if (i % 2 === 0) {
-      sheet.getRange(i + 2, 1, 1, headers.length).setBackground("#FFFFFF");
+    // Status cell colour
+    if (isCompleted) {
+      sheet.getRange(rowNum, 4).setBackground("#E0E0E0").setFontColor("#888888");
+    } else {
+      sheet.getRange(rowNum, 4).setBackground("#E8F5E9").setFontColor("#2E7D32").setFontWeight("bold");
     }
   });
 
-  // Bold the Total column and center-align Date Added
-  sheet.getRange(2, headers.length, activeWebinars.length, 1).setFontWeight("bold");
-  sheet.getRange(2, 2, activeWebinars.length, 1).setHorizontalAlignment("center");
+  // Bold Total column, center-align date columns and status
+  sheet.getRange(2, headers.length, allWebinars.length, 1).setFontWeight("bold");
+  sheet.getRange(2, 2, allWebinars.length, 3).setHorizontalAlignment("center");
 
   // Auto-resize columns
   sheet.autoResizeColumns(1, headers.length);
