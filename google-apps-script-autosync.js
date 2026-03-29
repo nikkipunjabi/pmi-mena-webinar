@@ -6,6 +6,7 @@
 
 const WEBINARS_SHEET = "Webinars";
 const TRACKING_SHEET = "Tracking Data";
+const SUMMARY_SHEET  = "Summary";
 
 // ── Sheet Setup ─────────────────────────────────────────────
 
@@ -35,6 +36,88 @@ function getTrackingSheet() {
     "timestamp", "webinarId", "webinarTitle", "targetUrl",
     "source", "userAgent", "referrer", "language", "screenSize"
   ]);
+}
+
+// ── Summary Sheet ────────────────────────────────────────────
+// Rebuilds the Summary sheet whenever a webinar is added or deleted.
+// COUNTIFS formulas update click counts live as tracking data arrives.
+
+function rebuildSummarySheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  // Remove and recreate for a clean rebuild
+  const existing = ss.getSheetByName(SUMMARY_SHEET);
+  if (existing) ss.deleteSheet(existing);
+  const sheet = ss.insertSheet(SUMMARY_SHEET);
+
+  // Move Summary to first position
+  ss.setActiveSheet(sheet);
+  ss.moveActiveSheet(1);
+
+  const platforms = ["email", "linkedin", "facebook", "instagram", "twitter"];
+  const headers = ["Webinar", ...platforms.map(p => p.charAt(0).toUpperCase() + p.slice(1)), "Total"];
+
+  // Header row
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  sheet.getRange(1, 1, 1, headers.length)
+    .setBackground("#5B2C6F")
+    .setFontColor("#FFFFFF")
+    .setFontWeight("bold");
+  sheet.setFrozenRows(1);
+
+  // Load active webinars
+  const webinarsSheet = getWebinarsSheet();
+  const rows = webinarsSheet.getDataRange().getValues();
+  if (rows.length <= 1) return; // no webinars yet
+
+  const wHeaders = rows[0];
+  const slugIndex   = wHeaders.indexOf("slug");
+  const titleIndex  = wHeaders.indexOf("title");
+  const statusIndex = wHeaders.indexOf("status");
+
+  const activeWebinars = rows.slice(1).filter(r => r[statusIndex] === "active");
+  if (activeWebinars.length === 0) return;
+
+  // Write one row per webinar with COUNTIFS formulas
+  activeWebinars.forEach((webinar, i) => {
+    const rowNum = i + 2; // row 1 is header
+    const slug  = webinar[slugIndex];
+    const title = webinar[titleIndex];
+
+    // Col A: webinar title
+    sheet.getRange(rowNum, 1).setValue(title);
+
+    // Cols B–F: COUNTIFS per platform
+    // Tracking Data col B = webinarId, col E = source
+    platforms.forEach((platform, pi) => {
+      const col = pi + 2;
+      const formula = `=COUNTIFS('Tracking Data'!B:B,"${slug}",'Tracking Data'!E:E,"${platform}")`;
+      sheet.getRange(rowNum, col).setFormula(formula);
+    });
+
+    // Col G: Total = SUM of platform cols
+    const firstPlatformCol = "B";
+    const lastPlatformCol  = String.fromCharCode(65 + platforms.length); // F
+    sheet.getRange(rowNum, platforms.length + 2)
+      .setFormula(`=SUM(${firstPlatformCol}${rowNum}:${lastPlatformCol}${rowNum})`);
+  });
+
+  // Formatting
+  const dataRange = sheet.getRange(2, 1, activeWebinars.length, headers.length);
+  dataRange.setBackground("#F9F6FC");
+
+  // Alternate row shading
+  activeWebinars.forEach((_, i) => {
+    if (i % 2 === 0) {
+      sheet.getRange(i + 2, 1, 1, headers.length).setBackground("#FFFFFF");
+    }
+  });
+
+  // Bold the Total column
+  sheet.getRange(2, headers.length, activeWebinars.length, 1).setFontWeight("bold");
+
+  // Auto-resize columns
+  sheet.autoResizeColumns(1, headers.length);
 }
 
 // ── CORS Helper ──────────────────────────────────────────────
@@ -161,6 +244,7 @@ function handleSaveWebinar(data) {
   });
 
   sheet.appendRow(row);
+  rebuildSummarySheet();
 
   return corsResponse({ status: "success", message: "Webinar saved" });
 }
@@ -175,6 +259,7 @@ function handleDeleteWebinar(id) {
   for (let i = 1; i < rows.length; i++) {
     if (String(rows[i][idIndex]) === String(id)) {
       sheet.getRange(i + 1, statusIndex + 1).setValue("deleted");
+      rebuildSummarySheet();
       return corsResponse({ status: "success", message: "Webinar deleted" });
     }
   }
