@@ -265,7 +265,7 @@
         backupLink.href = webinar.targetUrl;
         backupLink.style.display = "inline-block";
 
-        // Collect tracking data
+        // Fire tracking in background — do not await, redirect immediately
         const trackingData = {
           timestamp: new Date().toISOString(),
           webinarId: webinar.slug,
@@ -278,25 +278,14 @@
           screenSize: `${screen.width}x${screen.height}`,
         };
 
-        // Send tracking data to Google Sheets
         fetch(GOOGLE_SCRIPT_URL, {
           method: "POST",
           mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(trackingData),
-        })
-          .then(() => {
-            console.log("Tracking logged");
-          })
-          .catch((err) => {
-            console.log("Tracking failed, but continuing redirect:", err);
-          })
-          .finally(() => {
-            // Redirect after 1.5 seconds
-            setTimeout(() => {
-              window.location.href = webinar.targetUrl;
-            }, 1500);
-          });
+        }).catch(() => {});
+
+        // Redirect immediately — don't wait for tracking
+        window.location.href = webinar.targetUrl;
       }
 
       // Show error
