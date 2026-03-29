@@ -1,540 +1,714 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webinar Link Manager</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Webinar Link Manager - PMI UAE Chapter</title>
+    <link rel="icon" type="image/png" href="https://www.pmiuae.org/images/pmiuae_favicon.png" />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          Oxygen,
+          Ubuntu,
+          Cantarell,
+          sans-serif;
+        background: linear-gradient(
+          135deg,
+          #2d1b3d 0%,
+          #5b2c6f 50%,
+          #6b3d7f 100%
+        );
+        min-height: 100vh;
+        padding: 2rem;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: -20%;
+        right: -10%;
+        width: 60%;
+        height: 60%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 107, 53, 0.08) 0%,
+          transparent 70%
+        );
+        border-radius: 50%;
+        z-index: 0;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 2rem;
+        padding: 2rem;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .logo img {
+        max-width: 220px;
+        height: auto;
+        filter: brightness(1.1);
+        margin-bottom: 1.5rem;
+      }
+
+      .header h1 {
+        font-size: 2.25rem;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+      }
+
+      .header p {
+        opacity: 0.9;
+        font-size: 1.1rem;
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .card h2 {
+        color: #5b2c6f;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #5b2c6f;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      input[type="text"],
+      textarea {
+        width: 100%;
+        padding: 0.875rem;
+        border: 2px solid #e0d5e8;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s;
+        font-family: inherit;
+      }
+
+      input[type="text"]:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #ff6b35;
+        box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+      }
+
+      textarea {
+        min-height: 60px;
+        resize: vertical;
+      }
+
+      .platform-checkboxes {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 1rem;
+        margin-top: 0.5rem;
+      }
+
+      .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        background: rgba(91, 44, 111, 0.05);
+        border-radius: 8px;
+      }
+
+      .checkbox-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #ff6b35;
+      }
+
+      .checkbox-item label {
+        margin: 0;
+        cursor: pointer;
+        font-weight: 500;
+        color: #5b2c6f;
+      }
+
+      .btn {
+        padding: 0.875rem 1.75rem;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #ff6b35 0%, #f26522 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+      }
+
+      .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 1.75rem;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .stat-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        background: linear-gradient(135deg, #ff6b35 0%, #f26522 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .stat-label {
+        color: #5b2c6f;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      .webinar-item {
+        background: linear-gradient(
+          135deg,
+          rgba(91, 44, 111, 0.03) 0%,
+          rgba(255, 107, 53, 0.03) 100%
+        );
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid #ff6b35;
+      }
+
+      .webinar-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #5b2c6f;
+        margin-bottom: 0.5rem;
+      }
+
+      .webinar-url {
+        font-size: 0.85rem;
+        color: #666;
+        word-break: break-all;
+      }
+
+      .link-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .link-item {
+        background: white;
+        border: 2px solid #e0d5e8;
+        border-radius: 10px;
+        padding: 1rem;
+      }
+
+      .platform-badge {
+        display: inline-block;
+        padding: 0.35rem 0.85rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+      }
+
+      .badge-email {
+        background: #fff3e0;
+        color: #e65100;
+      }
+      .badge-linkedin {
+        background: #e3f2fd;
+        color: #1565c0;
+      }
+      .badge-facebook {
+        background: #ede7f6;
+        color: #5b2c6f;
+      }
+      .badge-instagram {
+        background: #fce4ec;
+        color: #c2185b;
+      }
+      .badge-twitter {
+        background: #e1f5fe;
+        color: #0277bd;
+      }
+
+      .tracking-url {
+        font-size: 0.8rem;
+        color: #666;
+        word-break: break-all;
+        margin-bottom: 0.75rem;
+        padding: 0.625rem;
+        background: #f8f9fa;
+        border-radius: 6px;
+        font-family: "Monaco", monospace;
+      }
+
+      .copy-btn {
+        width: 100%;
+        padding: 0.625rem;
+        background: linear-gradient(135deg, #5b2c6f 0%, #6b3d7f 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+
+      .copy-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(91, 44, 111, 0.3);
+      }
+
+      .copy-btn.copied {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      }
+
+      .delete-btn {
+        color: #dc2626;
+        background: rgba(220, 38, 38, 0.1);
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem 0.75rem;
+        font-size: 1.1rem;
+        border-radius: 8px;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s;
+        z-index: 1000;
+        font-weight: 600;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .toast.error {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      }
+
+      .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+      }
+
+      .spinner {
+        border: 3px solid #e0d5e8;
+        border-top: 3px solid #ff6b35;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .config-notice {
+        background: rgba(255, 107, 53, 0.1);
+        border: 2px solid #ff6b35;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-top: 1rem;
+        color: #5b2c6f;
+      }
+
+      .config-notice strong {
+        color: #ff6b35;
+      }
+
+      @media (max-width: 768px) {
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 2rem;
+          padding: 1rem;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 2rem;
-        }
-
         .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
+          font-size: 1.75rem;
         }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
-
         .card {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+          padding: 1.5rem;
         }
-
-        .card h2 {
-            color: #333;
-            margin-bottom: 1.5rem;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #555;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-            font-family: inherit;
-        }
-
-        input[type="text"]:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        textarea {
-            min-height: 60px;
-            resize: vertical;
-        }
-
-        .platform-checkboxes {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-            margin-top: 0.5rem;
-        }
-
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .checkbox-item input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .checkbox-item label {
-            margin: 0;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
-        }
-
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
-
-        .btn-small {
-            padding: 0.5rem 1rem;
-            font-size: 0.85rem;
-        }
-
-        .webinar-list {
-            margin-top: 2rem;
-        }
-
-        .webinar-item {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border-left: 4px solid #667eea;
-        }
-
-        .webinar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 1rem;
-        }
-
-        .webinar-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 0.5rem;
-        }
-
-        .webinar-url {
-            font-size: 0.85rem;
-            color: #666;
-            word-break: break-all;
-        }
-
         .link-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
+          grid-template-columns: 1fr;
         }
-
-        .link-item {
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 1rem;
-            position: relative;
+        .logo img {
+          max-width: 180px;
         }
-
-        .platform-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 0.5rem;
-        }
-
-        .badge-email { background: #fef3c7; color: #92400e; }
-        .badge-linkedin { background: #dbeafe; color: #1e40af; }
-        .badge-facebook { background: #ddd6fe; color: #5b21b6; }
-        .badge-instagram { background: #fce7f3; color: #9f1239; }
-        .badge-twitter { background: #e0f2fe; color: #075985; }
-
-        .tracking-url {
-            font-size: 0.8rem;
-            color: #666;
-            word-break: break-all;
-            margin-bottom: 0.75rem;
-            padding: 0.5rem;
-            background: #f8f9fa;
-            border-radius: 4px;
-        }
-
-        .copy-btn {
-            width: 100%;
-            padding: 0.5rem;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: background 0.3s;
-        }
-
-        .copy-btn:hover {
-            background: #5568d3;
-        }
-
-        .copy-btn.copied {
-            background: #10b981;
-        }
-
-        .delete-btn {
-            color: #dc2626;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0.5rem;
-            font-size: 1.2rem;
-            transition: transform 0.2s;
-        }
-
-        .delete-btn:hover {
-            transform: scale(1.2);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #999;
-        }
-
-        .empty-state svg {
-            width: 64px;
-            height: 64px;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
-            padding: 1.5rem;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 0.25rem;
-        }
-
-        .stat-label {
-            color: #666;
-            font-size: 0.85rem;
-        }
-
-        .base-url-display {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .base-url-display strong {
-            color: #333;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-
-            .header h1 {
-                font-size: 1.8rem;
-            }
-
-            .card {
-                padding: 1.5rem;
-            }
-
-            .link-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: #10b981;
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s;
-            z-index: 1000;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="header">
-            <h1>🎯 Webinar Link Manager</h1>
-            <p>Create trackable links for all your webinars</p>
+      <div class="header">
+        <div class="logo">
+          <img
+            src="https://www.pmiuae.org/images/pmiuae_logo_jan_2026.png"
+            alt="PMI UAE Chapter"
+          />
         </div>
+        <h1>🎯 Webinar Link Manager</h1>
+        <p>Auto-sync with Google Sheets - No manual editing!</p>
+      </div>
 
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-value" id="totalWebinars">0</div>
-                <div class="stat-label">Total Webinars</div>
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-value" id="totalWebinars">0</div>
+          <div class="stat-label">Total Webinars</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="totalLinks">0</div>
+          <div class="stat-label">Tracking Links</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>➕ Add New Webinar</h2>
+        <form id="webinarForm">
+          <div class="form-group">
+            <label for="webinarTitle">Webinar Title</label>
+            <input
+              type="text"
+              id="webinarTitle"
+              placeholder="e.g., AI in Action"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="targetUrl">Target URL (Zoom/Webinar Link)</label>
+            <textarea
+              id="targetUrl"
+              placeholder="https://pmi-org.zoom.us/webinar/register/..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="webinarDate">Webinar Date</label>
+            <input
+              type="date"
+              id="webinarDate"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Platforms to Promote</label>
+            <div class="platform-checkboxes">
+              <div class="checkbox-item">
+                <input
+                  type="checkbox"
+                  id="platform-email"
+                  value="email"
+                  checked
+                />
+                <label for="platform-email">Email</label>
+              </div>
+              <div class="checkbox-item">
+                <input
+                  type="checkbox"
+                  id="platform-linkedin"
+                  value="linkedin"
+                  checked
+                />
+                <label for="platform-linkedin">LinkedIn</label>
+              </div>
+              <div class="checkbox-item">
+                <input
+                  type="checkbox"
+                  id="platform-facebook"
+                  value="facebook"
+                  checked
+                />
+                <label for="platform-facebook">Facebook</label>
+              </div>
+              <div class="checkbox-item">
+                <input
+                  type="checkbox"
+                  id="platform-instagram"
+                  value="instagram"
+                  checked
+                />
+                <label for="platform-instagram">Instagram</label>
+              </div>
+              <div class="checkbox-item">
+                <input
+                  type="checkbox"
+                  id="platform-twitter"
+                  value="twitter"
+                  checked
+                />
+                <label for="platform-twitter">Twitter</label>
+              </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="totalLinks">0</div>
-                <div class="stat-label">Tracking Links</div>
-            </div>
+          </div>
+
+          <div class="config-notice">
+            <strong>🔧 Configuration Required:</strong><br />
+            Set your Google Apps Script URL below (line ~340 in the HTML):<br />
+            <code
+              >const GOOGLE_SCRIPT_URL =
+              'https://script.google.com/macros/s/AKfycbyd0OAfB7uXx0nQ1O46W1Ul0ujZDzaX13kKAwj5Zwgqwk5nRuZuhqeU5_wbcV9VKfGeEA/exec'</code
+            >
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+            id="submitBtn"
+            style="margin-top: 1rem"
+          >
+            ✨ Generate Tracking Links
+          </button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>📊 Your Webinars</h2>
+        <div id="webinarList">
+          <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading webinars from Google Sheets...</p>
+          </div>
         </div>
-
-        <div class="card">
-            <h2>➕ Add New Webinar</h2>
-            <form id="webinarForm">
-                <div class="form-group">
-                    <label for="webinarTitle">Webinar Title</label>
-                    <input 
-                        type="text" 
-                        id="webinarTitle" 
-                        placeholder="e.g., AI in Action" 
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="targetUrl">Target URL (Zoom/Webinar Link)</label>
-                    <textarea 
-                        id="targetUrl" 
-                        placeholder="https://pmi-org.zoom.us/webinar/register/..." 
-                        required
-                    ></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Platforms to Promote</label>
-                    <div class="platform-checkboxes">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="platform-email" value="email" checked>
-                            <label for="platform-email">Email</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="platform-linkedin" value="linkedin" checked>
-                            <label for="platform-linkedin">LinkedIn</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="platform-facebook" value="facebook" checked>
-                            <label for="platform-facebook">Facebook</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="platform-instagram" value="instagram" checked>
-                            <label for="platform-instagram">Instagram</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="platform-twitter" value="twitter" checked>
-                            <label for="platform-twitter">Twitter</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="base-url-display">
-                    <strong>Base URL:</strong> nikkipunjabi.github.io/pmi-mena-webinar
-                </div>
-
-                <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
-                    Generate Tracking Links
-                </button>
-            </form>
-        </div>
-
-        <div class="card">
-            <h2>📊 Your Webinars</h2>
-            <div id="webinarList" class="webinar-list">
-                <div class="empty-state">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                    </svg>
-                    <p>No webinars yet. Add your first webinar above!</p>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
 
-    <div class="toast" id="toast">Link copied to clipboard!</div>
+    <div class="toast" id="toast">Link copied!</div>
 
     <script>
-        // CONFIGURATION - Your GitHub Pages URL
-        const BASE_URL = 'nikkipunjabi.github.io/pmi-mena-webinar';
+      // CONFIGURATION - Set your Google Apps Script URL here
+      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwNx-ZC_B39GLfjjH7HF7Np5SrJW1J6DwjaVKOoyeEtzftf-U5wOZmU6ducbboHi7X6/exec";
 
-        // Storage key
-        const STORAGE_KEY = 'webinarData';
+      // Base URL for tracking links
+      const BASE_URL = "pmiuae.org/pmi-mena-webinar/webinar-tracker";
 
-        // Load webinars from localStorage
-        function loadWebinars() {
-            const data = localStorage.getItem(STORAGE_KEY);
-            return data ? JSON.parse(data) : [];
+      let webinars = [];
+
+      // Generate slug from title
+      function generateSlug(title) {
+        return title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+      }
+
+      // Show toast
+      function showToast(message, isError = false) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.classList.toggle("error", isError);
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 3000);
+      }
+
+      // Copy to clipboard
+      async function copyToClipboard(text, button) {
+        try {
+          await navigator.clipboard.writeText(text);
+          const originalText = button.textContent;
+          button.textContent = "✓ Copied!";
+          button.classList.add("copied");
+          showToast("Link copied to clipboard!");
+          setTimeout(() => {
+            button.textContent = originalText;
+            button.classList.remove("copied");
+          }, 2000);
+        } catch (err) {
+          showToast("Failed to copy", true);
         }
+      }
 
-        // Save webinars to localStorage
-        function saveWebinars(webinars) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(webinars));
+      // Load webinars from Google Sheets
+      async function loadWebinars() {
+        try {
+          const response = await fetch(
+            `${GOOGLE_SCRIPT_URL}?action=get_webinars`,
+          );
+          const data = await response.json();
+
+          if (data.status === "success") {
+            webinars = data.webinars;
             updateStats();
             renderWebinars();
+          } else {
+            throw new Error(data.message);
+          }
+        } catch (error) {
+          console.error("Error loading webinars:", error);
+          document.getElementById("webinarList").innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #dc2626;">
+                        <p><strong>Error loading webinars</strong></p>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">${error.message}</p>
+                        <p style="font-size: 0.85rem; margin-top: 1rem;">Make sure your Google Apps Script URL is configured correctly.</p>
+                    </div>
+                `;
         }
+      }
 
-        // Generate slug from title
-        function generateSlug(title) {
-            return title.toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/^-+|-+$/g, '');
+      // Save webinar to Google Sheets
+      async function saveWebinar(webinar) {
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "save_webinar",
+            ...webinar,
+          }),
+        });
+        return response.json();
+      }
+
+      // Delete webinar from Google Sheets
+      async function deleteWebinar(id) {
+        if (!confirm("Delete this webinar and all tracking links?")) return;
+
+        try {
+          const response = await fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({
+              action: "delete_webinar",
+              id: id,
+            }),
+          });
+
+          const data = await response.json();
+          if (data.status === "success") {
+            showToast("Webinar deleted!");
+            loadWebinars(); // Reload
+          } else {
+            throw new Error(data.message);
+          }
+        } catch (error) {
+          showToast("Failed to delete", true);
         }
+      }
 
-        // Update statistics
-        function updateStats() {
-            const webinars = loadWebinars();
-            const totalLinks = webinars.reduce((sum, w) => sum + w.platforms.length, 0);
-            
-            document.getElementById('totalWebinars').textContent = webinars.length;
-            document.getElementById('totalLinks').textContent = totalLinks;
-        }
+      // Update stats
+      function updateStats() {
+        const totalLinks = webinars.reduce(
+          (sum, w) => sum + w.platforms.length,
+          0,
+        );
+        document.getElementById("totalWebinars").textContent = webinars.length;
+        document.getElementById("totalLinks").textContent = totalLinks;
+      }
 
-        // Show toast notification
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 2000);
-        }
+      // Render webinars
+      function renderWebinars() {
+        const container = document.getElementById("webinarList");
 
-        // Copy to clipboard
-        async function copyToClipboard(text, button) {
-            try {
-                await navigator.clipboard.writeText(text);
-                const originalText = button.textContent;
-                button.textContent = '✓ Copied!';
-                button.classList.add('copied');
-                showToast('Link copied to clipboard!');
-                
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.classList.remove('copied');
-                }, 2000);
-            } catch (err) {
-                alert('Failed to copy. Please copy manually.');
-            }
-        }
-
-        // Render webinars
-        function renderWebinars() {
-            const webinars = loadWebinars();
-            const container = document.getElementById('webinarList');
-
-            if (webinars.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
+        if (webinars.length === 0) {
+          container.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: #999;">
                         <p>No webinars yet. Add your first webinar above!</p>
                     </div>
                 `;
-                return;
-            }
+          return;
+        }
 
-            container.innerHTML = webinars.map((webinar, index) => `
+        container.innerHTML = webinars
+          .map(
+            (webinar) => `
                 <div class="webinar-item">
-                    <div class="webinar-header">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
                         <div>
                             <div class="webinar-title">${webinar.title}</div>
+                            ${webinar.webinarDate ? `<div class="webinar-url">📅 ${new Date(webinar.webinarDate + 'T00:00:00').toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}</div>` : ''}
                             <div class="webinar-url">Target: ${webinar.targetUrl}</div>
                         </div>
-                        <button class="delete-btn" onclick="deleteWebinar(${index})" title="Delete webinar">
+                        <button class="delete-btn" onclick="deleteWebinar('${webinar.id}')" title="Delete">
                             🗑️
                         </button>
                     </div>
                     
                     <div class="link-grid">
-                        ${webinar.platforms.map(platform => {
+                        ${webinar.platforms
+                          .map((platform) => {
                             const trackingUrl = `https://${BASE_URL}?id=${webinar.slug}&source=${platform}`;
                             return `
                                 <div class="link-item">
@@ -545,74 +719,76 @@
                                     </button>
                                 </div>
                             `;
-                        }).join('')}
+                          })
+                          .join("")}
                     </div>
                 </div>
-            `).join('');
-        }
+            `,
+          )
+          .join("");
+      }
 
-        // Delete webinar
-        function deleteWebinar(index) {
-            if (confirm('Are you sure you want to delete this webinar and all its tracking links?')) {
-                const webinars = loadWebinars();
-                webinars.splice(index, 1);
-                saveWebinars(webinars);
-            }
-        }
+      // Handle form submission
+      document
+        .getElementById("webinarForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-        // Handle form submission
-        document.getElementById('webinarForm').addEventListener('submit', (e) => {
-            e.preventDefault();
+          const title = document.getElementById("webinarTitle").value.trim();
+          const targetUrl = document.getElementById("targetUrl").value.trim();
+          const webinarDate = document.getElementById("webinarDate").value;
 
-            const title = document.getElementById('webinarTitle').value.trim();
-            const targetUrl = document.getElementById('targetUrl').value.trim();
-            
-            // Get selected platforms
-            const platforms = [];
-            document.querySelectorAll('.platform-checkboxes input[type="checkbox"]:checked').forEach(checkbox => {
-                platforms.push(checkbox.value);
+          const platforms = [];
+          document
+            .querySelectorAll(".platform-checkboxes input:checked")
+            .forEach((cb) => {
+              platforms.push(cb.value);
             });
 
-            if (platforms.length === 0) {
-                alert('Please select at least one platform!');
-                return;
+          if (platforms.length === 0) {
+            showToast("Select at least one platform!", true);
+            return;
+          }
+
+          const webinar = {
+            id: Date.now(),
+            title: title,
+            targetUrl: targetUrl,
+            slug: generateSlug(title),
+            platforms: platforms,
+            webinarDate: webinarDate,
+            createdAt: new Date().toISOString(),
+          };
+
+          // Disable button
+          const btn = document.getElementById("submitBtn");
+          btn.disabled = true;
+          btn.textContent = "⏳ Saving...";
+
+          try {
+            const result = await saveWebinar(webinar);
+
+            if (result.status === "success") {
+              showToast("Webinar added successfully!");
+              document.getElementById("webinarForm").reset();
+              document
+                .querySelectorAll(".platform-checkboxes input")
+                .forEach((cb) => (cb.checked = true));
+              await loadWebinars(); // Reload
+            } else {
+              throw new Error(result.message);
             }
-
-            // Create webinar object
-            const webinar = {
-                id: Date.now(),
-                title: title,
-                targetUrl: targetUrl,
-                slug: generateSlug(title),
-                platforms: platforms,
-                createdAt: new Date().toISOString()
-            };
-
-            // Save to storage
-            const webinars = loadWebinars();
-            webinars.unshift(webinar); // Add to beginning
-            saveWebinars(webinars);
-
-            // Reset form
-            document.getElementById('webinarForm').reset();
-            
-            // Re-check all platforms by default
-            document.querySelectorAll('.platform-checkboxes input[type="checkbox"]').forEach(checkbox => {
-                checkbox.checked = true;
-            });
-
-            // Show success message
-            showToast('Webinar added successfully!');
-
-            // Scroll to the new webinar
-            setTimeout(() => {
-                document.querySelector('.webinar-item').scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
+          } catch (error) {
+            showToast("Failed to save webinar", true);
+            console.error(error);
+          } finally {
+            btn.disabled = false;
+            btn.textContent = "✨ Generate Tracking Links";
+          }
         });
 
-        // Initialize
-        updateStats();
-        renderWebinars();
+      // Initialize
+      loadWebinars();
     </script>
-</body>
+  </body>
 </html>
